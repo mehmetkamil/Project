@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - EventPlanner</title>
+    <link rel="stylesheet" href="/css/admin-panel.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>🎫 EventPlanner</h2>
+                <p class="subtitle">Yönetim Paneli</p>
+            </div>
+            <nav class="nav-menu">
+                <a href="#dashboard" class="nav-item active" data-section="dashboard">
+                    <span class="icon">📊</span> Kontrol Paneli
+                </a>
+                <a href="#users" class="nav-item" data-section="users">
+                    <span class="icon">👥</span> Kullanıcılar
+                </a>
+                <a href="#events" class="nav-item" data-section="events">
+                    <span class="icon">🎉</span> Etkinlikler
+                </a>
+                <a href="#tickets" class="nav-item" data-section="tickets">
+                    <span class="icon">🎟️</span> Biletler
+                </a>
+                <a href="#payments" class="nav-item" data-section="payments">
+                    <span class="icon">💳</span> Ödemeler
+                </a>
+                <a href="#security" class="nav-item" data-section="security">
+                    <span class="icon">🔒</span> Güvenlik Kayıtları
+                </a>
+                <a href="#settings" class="nav-item" data-section="settings">
+                    <span class="icon">⚙️</span> Ayarlar
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <span class="icon">👤</span>
+                    <span id="admin-username">Admin</span>
+                </div>
+                <button onclick="logout()" class="btn-logout">Çıkış Yap</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <h1 id="page-title">Kontrol Paneli</h1>
+                <div class="header-actions">
+                    <button class="btn-refresh" onclick="refreshData()">🔄 Yenile</button>
+                    <div class="user-badge">
+                        <span class="badge badge-admin">ADMIN</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="content-section active">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2>Kontrol Paneli</h2>
+                    <button class="btn btn-sm btn-primary" onclick="loadDashboard()">
+                        <i class="bi bi-arrow-clockwise"></i> Yenile
+                    </button>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Toplam Kullanıcı</h3>
+                        <p class="stat-number" id="total-users">0</p>
+                        <span class="stat-label">Kayıtlı kullanıcılar</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Toplam Etkinlik</h3>
+                        <p class="stat-number" id="total-events">0</p>
+                        <span class="stat-label">Aktif etkinlikler</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Satılan Biletler</h3>
+                        <p class="stat-number" id="total-tickets">0</p>
+                        <span class="stat-label">Toplam biletler</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Gelir</h3>
+                        <p class="stat-number" id="total-revenue">₺0</p>
+                        <span class="stat-label">Toplam gelir</span>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3>Sistem Sağlığı</h3>
+                    <div id="health-status" class="health-status">
+                        <div class="health-item">
+                            <span class="health-label">API Durumu:</span>
+                            <span class="health-value" id="api-status">Kontrol ediliyor...</span>
+                        </div>
+                        <div class="health-item">
+                            <span class="health-label">Veritabanı:</span>
+                            <span class="health-value" id="db-status">Kontrol ediliyor...</span>
+                        </div>
+                        <div class="health-item">
+                            <span class="health-label">Bellek Kullanımı:</span>
+                            <span class="health-value" id="memory-usage">Kontrol ediliyor...</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Users Section -->
+            <section id="users-section" class="content-section">
+                <div class="section-header">
+                    <button class="btn-primary" onclick="loadUsers()">🔄 Kullanıcıları Yenile</button>
+                    <input type="text" id="user-search" placeholder="Kullanıcı ara..." class="search-input">
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Kullanıcı Adı</th>
+                                <th>E-posta</th>
+                                <th>Roller</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <tr>
+                                <td colspan="5" class="loading">Kullanıcılar yükleniyor...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Events Section -->
+            <section id="events-section" class="content-section">
+                <div class="section-header">
+                    <button class="btn-primary" onclick="loadEvents()">🔄 Etkinlikleri Yenile</button>
+                    <input type="text" id="event-search" placeholder="Etkinlik ara..." class="search-input">
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Başlık</th>
+                                <th>Konum</th>
+                                <th>Tarih</th>
+                                <th>Kapasite</th>
+                                <th>Müsait</th>
+                                <th>Fiyat</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody id="events-table-body">
+                            <tr>
+                                <td colspan="8" class="loading">Etkinlikler yükleniyor...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Tickets Section -->
+            <section id="tickets-section" class="content-section">
+                <div class="section-header">
+                    <button class="btn-primary" onclick="loadTickets()">🔄 Biletleri Yenile</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Bilet No</th>
+                                <th>Etkinlik</th>
+                                <th>Alıcı</th>
+                                <th>Satın Alma Tarihi</th>
+                                <th>Fiyat</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tickets-table-body">
+                            <tr>
+                                <td colspan="6" class="loading">Biletler yükleniyor...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Payments Section -->
+            <section id="payments-section" class="content-section">
+                <div class="section-header">
+                    <button class="btn-primary" onclick="loadPayments()">🔄 Ödemeleri Yenile</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>İşlem No</th>
+                                <th>Kullanıcı</th>
+                                <th>Tutar</th>
+                                <th>Yöntem</th>
+                                <th>Tarih</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payments-table-body">
+                            <tr>
+                                <td colspan="6" class="loading">Ödemeler yükleniyor...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Security Logs Section -->
+            <section id="security-section" class="content-section">
+                <div class="section-header">
+                    <button class="btn-primary" onclick="loadSecurityLogs()">🔄 Kayıtları Yenile</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Zaman</th>
+                                <th>Olay Tipi</th>
+                                <th>Kullanıcı Adı</th>
+                                <th>IP Adresi</th>
+                                <th>Durum</th>
+                                <th>Detaylar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="security-table-body">
+                            <tr>
+                                <td colspan="6" class="loading">Güvenlik kayıtları yükleniyor...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings-section" class="content-section">
+                <h2>Sistem Ayarları</h2>
+                <div class="settings-grid">
+                    <div class="setting-card">
+                        <h3>Uygulama Bilgileri</h3>
+                        <p><strong>Versiyon:</strong> 1.0.0</p>
+                        <p><strong>Profil:</strong> <span id="active-profile">default</span></p>
+                        <p><strong>Port:</strong> <span id="server-port">7777</span></p>
+                    </div>
+                    <div class="setting-card">
+                        <h3>Veritabanı</h3>
+                        <p><strong>Tip:</strong> <span id="db-type">H2/PostgreSQL</span></p>
+                        <p><strong>Durum:</strong> <span id="db-connection-status">Bağlı</span></p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/js/admin-panel.js?v=7"></script>
+</body>
+</html>

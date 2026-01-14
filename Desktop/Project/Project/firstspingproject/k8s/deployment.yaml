@@ -1,0 +1,211 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eventplanner-app
+  labels:
+    app: eventplanner
+    component: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: eventplanner
+      component: backend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: eventplanner
+        component: backend
+    spec:
+      containers:
+        - name: eventplanner
+          image: ghcr.io/your-org/eventplanner:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 7777
+              protocol: TCP
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: eventplanner-secrets
+                  key: database-url
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: eventplanner-secrets
+                  key: database-username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eventplanner-secrets
+                  key: database-password
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: eventplanner-secrets
+                  key: jwt-secret
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 7777
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 7777
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          volumeMounts:
+            - name: logs
+              mountPath: /var/log/eventplanner
+      volumes:
+        - name: logs
+          emptyDir: {}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - eventplanner
+                topologyKey: kubernetes.io/hostname
+
+---
+# ==========================================
+# Service
+# ==========================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: eventplanner-service
+  labels:
+    app: eventplanner
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 7777
+      protocol: TCP
+      name: http
+  selector:
+    app: eventplanner
+    component: backend
+
+---
+# ==========================================
+# Ingress
+# ==========================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: eventplanner-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+    - hosts:
+        - eventplanner.example.com
+      secretName: eventplanner-tls
+  rules:
+    - host: eventplanner.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: eventplanner-service
+                port:
+                  number: 80
+
+---
+# ==========================================
+# Horizontal Pod Autoscaler
+# ==========================================
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: eventplanner-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: eventplanner-app
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+---
+# ==========================================
+# Secrets Template
+# ==========================================
+apiVersion: v1
+kind: Secret
+metadata:
+  name: eventplanner-secrets
+type: Opaque
+stringData:
+  database-url: "jdbc:postgresql://postgres:5432/eventplanner"
+  database-username: "postgres"
+  database-password: "your-secure-password"
+  jwt-secret: "your-very-long-jwt-secret-key"
+
+---
+# ==========================================
+# ConfigMap
+# ==========================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eventplanner-config
+data:
+  application.yml: |
+    server:
+      port: 7777
+    spring:
+      profiles:
+        active: prod
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: health,info,prometheus
