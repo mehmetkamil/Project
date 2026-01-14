@@ -1,20 +1,20 @@
 # Spring Boot Microservices Event Management System
 
-Bu proje, Spring Boot kullanılarak geliştirilmiş bir etkinlik yönetim sistemidir. Mikroservis mimarisine dayalı olarak tasarlanmıştır.
+This project is an event management system developed using Spring Boot, designed with a microservices architecture.
 
-## Proje Yapısı
+## Project Structure
 
-### Monolitik Proje
-- **firstspingproject**: Ana uygulama servisi
+### Monolithic Application
+- **firstspingproject**: Main application service
 
-### Mikroservisler
-- **user-service**: Kullanıcı yönetimi ve kimlik doğrulama
-- **event-service**: Etkinlik yönetimi
-- **booking-service**: Bilet rezervasyon sistemi
-- **payment-service**: Ödeme işlemleri
+### Microservices
+- **user-service**: User management and authentication
+- **event-service**: Event management
+- **booking-service**: Ticket reservation system
+- **payment-service**: Payment processing
 - **discovery-server**: Eureka Discovery Server
 
-## Teknolojiler
+## Technologies
 
 - Java 17+
 - Spring Boot 3.x
@@ -25,26 +25,26 @@ Bu proje, Spring Boot kullanılarak geliştirilmiş bir etkinlik yönetim sistem
 - Maven
 - Eureka Discovery Server
 
-## Kurulum
+## Installation
 
 ```bash
-# Projeyi klonlayın
+# Clone the repository
 git clone <repository-url>
 
-# Mikroservisleri derleyin
+# Build the microservices
 cd microservices-parent
 mvn clean install
 
-# Her servisi ayrı ayrı çalıştırın
+# Run each service separately
 cd discovery-server
 mvn spring-boot:run
 ```
 
-## Özellikler
+## Features
 
-- ✅ JWT tabanlı kimlik doğrulama
-- ✅ Mikroservis mimarisi
+- ✅ JWT-based authentication
+- ✅ Microservices architecture
 - ✅ Service Discovery (Eureka)
-- ✅ Güvenlik denetim günlükleri
+- ✅ Security audit logging
 - ✅ RESTful API
-- ✅ Yönetici paneli
+- ✅ Admin panel
