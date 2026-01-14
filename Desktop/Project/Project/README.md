@@ -48,7 +48,3 @@ mvn spring-boot:run
 - ✅ Güvenlik denetim günlükleri
 - ✅ RESTful API
 - ✅ Yönetici paneli
-
-## Lisans
-
-MIT License
