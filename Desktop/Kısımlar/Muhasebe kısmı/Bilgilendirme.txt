@@ -1,0 +1,41 @@
+AXA Sigorta Komisyon ve İşlem Notları
+1. Genel Tanımlamalar ve Kurallar
+
+Ödeme Durumları: * Açık: Ödeme bizden yapılıyor.
+
+Kapalı: Ödeme onlardan (sigorta şirketinden) yapılıyor.
+
+Hesaplama Temeli: Tramer hariç tüm komisyonlar net prim üzerinden hesaplanacaktır.
+
+2. Komisyon Oranları (Genel)
+Aksi belirtilmedikçe uygulanacak standart oranlar:
+
+Kasko: %15
+
+İşyeri, Konut, Sağlık: %15
+
+Nakliye: %15
+
+Trafik: %10
+
+3. Kişi Bazlı Özel Kurallar
+Sistemde tanımlı kişiler: Yaşar, Kamil, Tezer, CMC
+
+A. Tezer İçin Özel Oranlar:
+
+Trafik: %10
+
+Kalan Diğer Branşlar: %13
+
+B. Ödenen Komisyon Paylaşımı:
+
+Yaşar: Toplam komisyonun her zaman %60'ı.
+
+Diğer Kişiler: Toplam komisyon üzerinden %50 sabit pay.
+
+4. Cari ve Muhasebe İşlemleri
+Cari Kesim: Cari kesim işlemi mutlaka yapılacak.
+
+POS Tahsilat: Gönderilen POS tahsilat makbuzları cari kesim için kullanılacak (Not: Makbuzun en alt kısmına gerek yok).
+
+İkinci Poliçeler: Aynı iş için yapılan ikinci poliçelerde sadece "çekim" işlemi yapılacak; bu poliçeler için ayrıca komisyon hesabı yapılmayacak. (Not: Sarı ekran uyarısı).
